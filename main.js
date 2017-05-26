@@ -45,7 +45,7 @@ function connect() {
 			// Will print 'hi!'
 			console.log(data);
 
-			$('#chat-output').text($('#chat-output').text() + '<br/>' + data)
+			$('#chat-output').text($('#chat-output').text() + '\n' + data)
 		});
 	});
 
