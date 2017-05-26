@@ -77,6 +77,7 @@ function send_message() {
 	$('#input-chat-box').val('')
 	if (text != '' && conn != null && conn.open) {
 		conn.send(name + '> ' + text)
+		$('#chat-output').text($('#chat-output').text() + '\n' + name + '> ' + text)
 	}
 }
 
