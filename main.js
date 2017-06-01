@@ -2,7 +2,41 @@ var peer = null
 var ip = null
 var name = "dummy"
 
+var id_prefix = 'serverlesschat'
+
 var conn = null
+
+Base64 = (function () {
+	var digitsStr =
+		//   0       8       16      24      32      40      48      56     63
+		//   v       v       v       v       v       v       v       v      v
+		"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-";
+	var digits = digitsStr.split('');
+	var digitsMap = {};
+	for (var i = 0; i < digits.length; i++) {
+		digitsMap[digits[i]] = i;
+	}
+	return {
+		fromInt: function (int32) {
+			var result = '';
+			while (true) {
+				result = digits[int32 & 0x3f] + result;
+				int32 >>>= 6;
+				if (int32 === 0)
+					break;
+			}
+			return result;
+		},
+		toInt: function (digitsStr) {
+			var result = 0;
+			var digits = digitsStr.split('');
+			for (var i = 0; i < digits.length; i++) {
+				result = (result << 6) + digitsMap[digits[i]];
+			}
+			return result;
+		}
+	};
+})();
 
 window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection; //compatibility for firefox and chrome
 var pc = new RTCPeerConnection({
@@ -34,9 +68,10 @@ function check_if_ip_ready() {
 }
 
 function connect() {
-	my_id = ip.split('.')[2] + '.' + ip.split('.')[3]
+	my_id = parseInt(ip.split('.')[2]) * 256 + parseInt(ip.split('.')[3])
+	my_id = Base64.fromInt(my_id)
 
-	peer = new Peer(my_id.replace('.', 'x'), {
+	peer = new Peer(id_prefix + my_id, {
 		key: 'k21h7zsvzls4te29'
 	});
 
@@ -51,9 +86,9 @@ function connect() {
 
 	alert("Your id: " + my_id)
 
-	other_id = prompt("Other id: ").replace('.', 'x')
+	other_id = prompt("Other id: ")
 
-	conn = peer.connect(other_id)
+	conn = peer.connect(id_prefix + other_id)
 	conn.on('open', function () {
 		console.log('connection opened!')
 		conn.send("\'" + name + "\'" + " joined!");
@@ -78,6 +113,16 @@ function send_message() {
 	if (text != '' && conn != null && conn.open) {
 		conn.send(name + '> ' + text)
 		$('#chat-output').html($('#chat-output').html() + '\n' + name + '> ' + text)
+	}
+}
+
+function append_display_text(text, bold = false) {
+	var clean_text = text.replace('<', '&lt').replace('>', '&gt')
+	if (bold) {
+		// $("#chat-list-group").append("<li class='list-group-item chat-message'><b>" + clean_text + "</b></li>");
+		$("#chat-list-group").append("<li class='list-group-item chat-message-strong'>" + clean_text + "</li>");
+	} else {
+		$("#chat-list-group").append("<li class='list-group-item chat-message'>" + text.replace('<', '&lt') + "</li>");
 	}
 }
 

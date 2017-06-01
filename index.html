@@ -13,7 +13,11 @@
         }
 
         #chat-output {
-          white-space: pre-wrap;
+            white-space: pre-wrap;
+        }
+
+        .chat-message-strong {
+            background-color: #CCC
         }
     </style>
 </head>
@@ -24,7 +28,11 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Local Chat</h3>
             </div>
-            <div class="panel-body" id="chat-output">Welcome!<br>Use the text box below to chat<br><br></div>
+            <div class="panel-body" id="chat-output">
+                <ul class="list-group" id="chat-list-group">
+                    <li class="list-group-item">Welcome!<br>Use the text box below to chat<br><br></div>
+            </li>
+            </ul>
             <div class="panel-footer" id="panel_footer">
                 <!-- <input type="text" class="form-control" placeholder="Input your chat messages here"> -->
                 <div class="input-group">
